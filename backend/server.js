@@ -1,21 +1,25 @@
 import express from "express";
 import mongoose from "mongoose";
-import cors from "cors";
 import dotenv from "dotenv";
+import cors from "cors";
 
-import employeeRoutes from "./routes/employee.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import employeeRoutes from "./routes/employee.routes.js"; // FIXED: correct filename
 
-dotenv.config({ path: './backend/.env'});
-console.log("MONGO_URI", process.env.MONGO_URI);
+dotenv.config();
+
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/employees", employeeRoutes);
-
-const PORT = process.env.PORT || 5000;
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => app.listen(PORT, () => console.log(`Server running on ${PORT}`)))
-  .catch((err) => console.error(err));
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("Mongo Error:", err));
+
+app.use("/api", authRoutes);
+app.use("/api/employees", employeeRoutes); // Now matches the correct file
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

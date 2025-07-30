@@ -25,6 +25,22 @@ export default function EmployeeList() {
   };
 
   useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const token = localStorage.getItem("token"); // assuming you store token here
+        const res = await fetch("http://localhost:5000/api/employees", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) throw new Error("Unauthorized");
+        const data = await res.json();
+        setEmployees(data);
+      } catch (error) {
+        console.error("Failed to fetch employees", error.message);
+      }
+    };
+
     fetchEmployees();
   }, []);
 

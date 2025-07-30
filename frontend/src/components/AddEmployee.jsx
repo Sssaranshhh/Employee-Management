@@ -22,13 +22,19 @@ export default function AddEmployee() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-      await axios.post("http://localhost:5000/api/employees", formData);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post("http://localhost:5000/api/employees", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       navigate("/");
     } catch (err) {
       console.error("Error creating employee: ", err);
     }
   };
+
 
   return (
     <div className="max-w-xl mx-auto p-6">
