@@ -51,10 +51,10 @@ export default function EmployeeList() {
           <tr className="bg-gray-100">
             {[
               "Name",
-              "Email",
               "Position",
               "Department",
               "Salary",
+              "Joining Date",
               "Actions",
             ].map((h) => (
               <th key={h} className="border px-4 py-2">
@@ -67,10 +67,14 @@ export default function EmployeeList() {
           {employees.map((emp) => (
             <tr key={emp._id} className="text-center">
               <td className="border px-4 py-2">{emp.name}</td>
-              <td className="border px-4 py-2">{emp.email}</td>
               <td className="border px-4 py-2">{emp.position}</td>
               <td className="border px-4 py-2">{emp.department}</td>
               <td className="border px-4 py-2">{emp.salary}</td>
+              <td className="border px-4 py-2">
+                {emp.dateJoined
+                  ? new Date(emp.dateJoined).toLocaleDateString()
+                  : ""}
+              </td>
               <td className="border px-4 py-2 space-x-2">
                 <button
                   onClick={() => navigate(`/edit/${emp._id}`)}
