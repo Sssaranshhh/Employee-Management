@@ -1,60 +1,102 @@
-import { useState } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import api from "../api";
 
-export default function Signup() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default function Signup({ onSignup }) {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "",
+    salary: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/signup", {
-        email,
-        password,
+      // console.log("Saving employee:", employee);
+      await api.post("/auth/signup", {
+        ...form,
+        salary: Number(form.salary), // convert to number
       });
+
       alert("Signup successful! You can now log in.");
-      setEmail("");
-      setPassword("");
+      if (onSignup) onSignup();
     } catch (err) {
       console.error("Signup error:", err);
-      const msg = err.response?.data?.message || "Signup failed.";
-      alert(msg);
+      alert(err.response?.data?.message || "Signup failed");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-200 to-violet-200">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-100 to-teal-100">
       <form
         onSubmit={handleSignup}
-        className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md space-y-6"
+        className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md space-y-5"
       >
-        <h2 className="text-2xl font-semibold text-center text-violet-700">
-          Sign Up
+        <h2 className="text-2xl font-semibold text-center text-indigo-700">
+          Signup
         </h2>
 
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          name="name"
+          placeholder="Full Name"
+          value={form.name}
+          onChange={handleChange}
           required
-          className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-400"
+          className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400"
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400"
         />
 
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={form.password}
+          onChange={handleChange}
           required
-          className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-400"
+          className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400"
+        />
+
+        <input
+          type="text"
+          name="role"
+          placeholder="Role (e.g. Developer)"
+          value={form.role}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400"
+        />
+
+        <input
+          type="number"
+          name="salary"
+          placeholder="Salary"
+          value={form.salary}
+          onChange={handleChange}
+          required
+          className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-400"
         />
 
         <button
           type="submit"
-          className="w-full bg-violet-600 text-white py-3 rounded-xl hover:bg-violet-700 transition duration-200 font-medium"
+          className="w-full bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 transition duration-200 font-medium"
         >
-          Sign Up
+          Signup
         </button>
       </form>
     </div>

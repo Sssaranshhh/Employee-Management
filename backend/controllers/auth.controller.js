@@ -1,32 +1,58 @@
-// tempSeedUser.js
-import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import dotenv from "dotenv";
-import User from "./models/user.model.js"; // adjust path if needed
+import bcrypt from "bcryptjs";
+import Employee from "../models/employee.model.js";
 
-dotenv.config();
+export const login = async (req, res) => {
+  const { email, password } = req.body;
 
-const createAdminUser = async () => {
-  await mongoose.connect(process.env.MONGO_URI);
+  if (!email || !password)
+    return res.status(400).json({ message: "Email and password are required" });
 
-  const existing = await User.findOne({ email: "admin@example.com" });
-  if (existing) {
-    console.log("User already exists");
-    return process.exit();
+  try {
+    const user = await Employee.findOne({ email });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res.status(401).json({ message: "Incorrect password" });
+
+    // You can set a cookie or return user data here
+    res.status(200).json({ message: "Login successful", user });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
-
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash("admin123", salt);
-
-  const newUser = new User({
-    name: "Admin",
-    email: "admin@example.com",
-    password: hashedPassword,
-  });
-
-  await newUser.save();
-  console.log("Admin user created");
-  process.exit();
 };
 
-createAdminUser();
+
+export const signup = async (req, res) => {
+  const { name, email, password, role, salary } = req.body;
+
+  if (!name || !email || !password || !role || !salary) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  try {
+    const existing = await Employee.findOne({ email });
+    if (existing) {
+      return res.status(409).json({ message: "Email already in use" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const employee = new Employee({
+      name,
+      email,
+      role,
+      salary,
+      password: hashedPassword, // ✅ store hashed password
+    });
+
+    await employee.save();
+
+    res.status(201).json({ message: "Signup successful", employee });
+  } catch (err) {
+    console.error("Signup error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

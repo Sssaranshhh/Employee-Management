@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "../api";
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");
@@ -9,26 +9,21 @@ export default function Login({ onLogin }) {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5000/api/login", {
+      const res = await api.post("/auth/login", {
         email,
         password,
       });
 
-      localStorage.setItem("token", res.data.token);
-
-      if (onLogin) onLogin(res.data.user);
-
       alert("Login successful!");
+      if (onLogin) onLogin(res.data.user);
     } catch (err) {
       console.error("Login error:", err);
-      alert(
-        err.response?.data?.message || "Invalid credentials or server error."
-      );
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-200 to-indigo-200">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-100 to-indigo-100">
       <form
         onSubmit={handleLogin}
         className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md space-y-6"
