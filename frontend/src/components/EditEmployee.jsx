@@ -86,9 +86,7 @@ export default function EditEmployee() {
           type="date"
           name="dateJoined"
           value={
-            employeeData.dateJoined
-              ? employeeData.dateJoined.slice(0, 10)
-              : ""
+            employeeData.dateJoined ? employeeData.dateJoined.slice(0, 10) : ""
           }
           onChange={handleChange}
           placeholder="Date Joined"
