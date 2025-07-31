@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api"; // use your wrapper
 
@@ -12,6 +12,15 @@ const AddEmployee = () => {
     dateJoined: "",
   });
 
+  // 🔒 Auth check on component load
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Please log in to add an employee.");
+      navigate("/login");
+    }
+  }, [navigate]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -24,7 +33,6 @@ const AddEmployee = () => {
 
     try {
       const token = localStorage.getItem("token");
-
       await api.post(
         "/employees",
         {
