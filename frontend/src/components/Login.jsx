@@ -14,6 +14,9 @@ export default function Login({ onLogin }) {
         password,
       });
 
+      // ✅ Save token to localStorage
+      localStorage.setItem("token", res.data.token);
+
       alert("Login successful!");
       if (onLogin) onLogin(res.data.user);
     } catch (err) {

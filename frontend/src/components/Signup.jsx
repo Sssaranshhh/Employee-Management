@@ -18,11 +18,15 @@ export default function Signup({ onSignup }) {
     e.preventDefault();
 
     try {
-      // console.log("Saving employee:", employee);
-      await api.post("/auth/signup", {
+      const res = await api.post("/auth/signup", {
         ...form,
-        salary: Number(form.salary), // convert to number
+        salary: Number(form.salary),
       });
+
+      // ✅ Store token
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
 
       alert("Signup successful! You can now log in.");
       if (onSignup) onSignup();

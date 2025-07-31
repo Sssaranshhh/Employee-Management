@@ -1,90 +1,106 @@
-import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api"; // use your wrapper
 
-export default function AddEmployee() {
+const AddEmployee = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    role: "",
+    position: "",
+    department: "",
     salary: "",
+    dateJoined: "",
   });
 
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value,
-    }));
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found. User must log in.");
 
-      await axios.post("http://localhost:5000/api/employees", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await api.post(
+        "/employees",
+        {
+          ...formData,
+          salary: Number(formData.salary),
+          dateJoined: formData.dateJoined
+            ? new Date(formData.dateJoined)
+            : undefined,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       navigate("/");
-    } catch (err) {
+    } catch (error) {
       console.error(
-        "Error creating employee: ",
-        err.response?.data || err.message
+        "Error adding employee:",
+        error.response?.data || error.message
       );
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4">Add New Employee</h2>
+    <div className="max-w-md mx-auto p-4">
+      <h2 className="text-2xl font-bold mb-4">Add Employee</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           name="name"
+          placeholder="Name"
           value={formData.name}
           onChange={handleChange}
-          placeholder="Name"
-          className="w-full px-4 py-2 border rounded"
           required
+          className="w-full p-2 border rounded"
         />
         <input
-          name="email"
-          value={formData.email}
+          name="position"
+          placeholder="Position"
+          value={formData.position}
           onChange={handleChange}
-          placeholder="Email"
-          type="email"
-          className="w-full px-4 py-2 border rounded"
           required
+          className="w-full p-2 border rounded"
         />
         <input
-          name="role"
-          value={formData.role}
+          name="department"
+          placeholder="Department"
+          value={formData.department}
           onChange={handleChange}
-          placeholder="Role"
-          className="w-full px-4 py-2 border rounded"
-          required
+          className="w-full p-2 border rounded"
         />
         <input
           name="salary"
+          type="number"
+          placeholder="Salary"
           value={formData.salary}
           onChange={handleChange}
-          placeholder="Salary"
-          type="number"
-          className="w-full px-4 py-2 border rounded"
-          required
+          className="w-full p-2 border rounded"
+        />
+        <input
+          name="dateJoined"
+          type="date"
+          value={formData.dateJoined}
+          onChange={handleChange}
+          className="w-full p-2 border rounded"
         />
         <button
           type="submit"
-          className="bg-green-500 text-white px-4 py-2 rounded"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
         >
-          Create Employee
+          Add Employee
         </button>
       </form>
     </div>
   );
-}
+};
+
+export default AddEmployee;

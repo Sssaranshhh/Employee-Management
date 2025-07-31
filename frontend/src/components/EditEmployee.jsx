@@ -1,90 +1,69 @@
-import axios from "axios";
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 export default function EditEmployee() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
-  const [formData, setFormData] = useState({
+  const [employeeData, setEmployeeData] = useState({
     name: "",
     email: "",
-    role: "",
+    position: "",
+    department: "",
     salary: "",
   });
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/employees`)
-      .then((res) => {
-        const employee = res.data.find((emp) => emp._id === id);
-        if (employee) {
-          setFormData(employee);
-        }
+      .get(`http://localhost:5000/api/employees/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
-      .catch((err) => console.error("Error fetching employee:", err));
-  }, [id]);
+      .then((res) => setEmployeeData(res.data))
+      .catch((err) => console.log(err));
+  }, [id, token]);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setEmployeeData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await axios.put(`http://localhost:5000/api/employees/${id}`, formData);
-      navigate("/");
-    } catch (err) {
-      console.error("Error updating employee: ", err);
-    }
+    axios
+      .put(`http://localhost:5000/api/employees/${id}`, employeeData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(() => navigate("/employees"))
+      .catch((err) => console.log(err));
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6">
-      <h2 className="text-2xl font-bold mb-4">Edit Employee</h2>
+    <div className="p-8 max-w-xl mx-auto">
+      <h2 className="text-2xl font-semibold mb-4">Edit Employee</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Name"
-          className="w-full px-4 py-2 border rounded"
-          required
-        />
-        <input
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Email"
-          type="email"
-          className="w-full px-4 py-2 border rounded"
-          required
-        />
-        <input
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          placeholder="Role"
-          className="w-full px-4 py-2 border rounded"
-          required
-        />
-        <input
-          name="salary"
-          value={formData.salary}
-          onChange={handleChange}
-          placeholder="Salary"
-          type="number"
-          className="w-full px-4 py-2 border rounded"
-          required
-        />
+        {["name", "email", "position", "department", "salary"].map((field) => (
+          <input
+            key={field}
+            type={field === "salary" ? "number" : "text"}
+            name={field}
+            value={employeeData[field]}
+            onChange={handleChange}
+            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+            className="w-full border rounded px-4 py-2"
+            required={field !== "department"}
+          />
+        ))}
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded"
+          className="bg-blue-600 text-white px-6 py-2 rounded"
         >
-          Update Employee
+          Save Changes
         </button>
       </form>
     </div>
