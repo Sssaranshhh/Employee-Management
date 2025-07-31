@@ -1,14 +1,13 @@
-import axios from "axios"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import axios from "axios";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function AddEmployee() {
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     role: "",
-    salary: ""
+    salary: "",
   });
 
   const navigate = useNavigate();
@@ -16,25 +15,30 @@ export default function AddEmployee() {
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
-    }))
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found. User must log in.");
+
       await axios.post("http://localhost:5000/api/employees", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       navigate("/");
     } catch (err) {
-      console.error("Error creating employee: ", err);
+      console.error(
+        "Error creating employee: ",
+        err.response?.data || err.message
+      );
     }
   };
-
 
   return (
     <div className="max-w-xl mx-auto p-6">

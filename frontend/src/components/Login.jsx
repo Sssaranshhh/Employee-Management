@@ -1,43 +1,67 @@
-// components/Login.jsx
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post("http://localhost:5000/api/login", {
         email,
         password,
       });
+
       localStorage.setItem("token", res.data.token);
-      navigate("/");
+
+      if (onLogin) onLogin(res.data.user);
+
+      alert("Login successful!");
     } catch (err) {
-      alert("Login failed");
+      console.error("Login error:", err);
+      alert(
+        err.response?.data?.message || "Invalid credentials or server error."
+      );
     }
   };
 
   return (
-    <form onSubmit={handleLogin} className="max-w-md mx-auto space-y-4 p-4">
-      <input
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-      />
-      <input
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        type="password"
-      />
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2">
-        Login
-      </button>
-    </form>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-200 to-indigo-200">
+      <form
+        onSubmit={handleLogin}
+        className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md space-y-6"
+      >
+        <h2 className="text-2xl font-semibold text-center text-indigo-700">
+          Login
+        </h2>
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="w-full p-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 transition duration-200 font-medium"
+        >
+          Login
+        </button>
+      </form>
+    </div>
   );
 }

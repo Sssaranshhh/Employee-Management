@@ -1,19 +1,19 @@
 import express from "express";
+
 import {
-  getAll,
   create,
+  getAll,
   update,
   remove,
-} from "../controllers/employee.controller.js";
+} from "../controllers/employee.controller.js"; 
 import { authenticateToken } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.use(authenticateToken); // Protect all routes
-
-router.get("/", getAll);
-router.post("/", create);
-router.put("/:id", update);
-router.delete("/:id", remove);
+// Protect routes
+router.post("/", authenticateToken, create);
+router.get("/", authenticateToken, getAll);
+router.put("/:id", authenticateToken, update);
+router.delete("/:id", authenticateToken, remove);
 
 export default router;

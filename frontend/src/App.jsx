@@ -3,6 +3,7 @@ import AddEmployee from './components/AddEmployee';
 import EditEmployee from './components/EditEmployee';
 import EmployeeList from './components/EmployeeList';
 import Login from "./components/Login";
+import Signup from './components/Signup';
 
 function App() {
 
@@ -14,7 +15,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/Login" element={<Login/>} />
+        <Route path="/signup" element={<Signup/>} />
+        <Route path="/login" element={<Login/>} />
         <Route path="/" element={<EmployeeList />} />
         <Route path="/add" element={<AddEmployee />} />
         <Route path="/edit/:id" element={<EditEmployee />} />
