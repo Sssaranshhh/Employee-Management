@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api";
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -14,11 +16,17 @@ export default function Login({ onLogin }) {
         password,
       });
 
-      // ✅ Save token to localStorage
-      localStorage.setItem("token", res.data.token);
+      const token = res.data.token;
+      // ✅ Save token
+      localStorage.setItem("token", token);
+      // ✅ Set default auth header for future requests
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       alert("Login successful!");
+
       if (onLogin) onLogin(res.data.user);
+      // ✅ redirect to home
+      navigate("/", { replace: true });
     } catch (err) {
       console.error("Login error:", err);
       alert(err.response?.data?.message || "Login failed");
